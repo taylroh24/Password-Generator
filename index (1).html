@@ -108,7 +108,7 @@
   <! matrux crap
   <canvas id="matrixCanvas"></canvas>
 
-  <!-- Audio (autoplay with mute fallback) -->
+  <!-- i dont think this works although a good try-->
   <audio id="ambientAudio" autoplay loop>
     <source src="https://cdn.pixabay.com/audio/2023/03/06/audio_96a738b9a3.mp3" type="audio/mp3">
     Your browser does not support the audio element.
@@ -133,7 +133,7 @@
   </div>
 
   <script>
-    // Matrix Background
+    // matrix type shi
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -183,7 +183,7 @@
       }, speed);
     }
 
-    // Password Generator
+    // actual generetor function
     function generateSecureString() {
       const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*(!#^&>)';
       const array = new Uint32Array(16);
