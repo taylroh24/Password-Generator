@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Genertor Pluh</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      font-family: monospace;
+      height: 100%;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #00ff00;
+      text-shadow: 0 0 10px #00ff00;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1::before {
+      content: "💻";
+      font-size: 1.5em;
+    }
+
+    #output {
+      font-size: 1.5em;
+      background-color: rgba(0, 255, 0, 0.1);
+      border: 2px solid #00ff00;
+      padding: 15px 30px;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ff00;
+      word-break: break-word;
+      min-height: 1.5em;
+    }
+
+    button {
+      font-size: 1em;
+      padding: 12px 25px;
+      margin: 10px;
+      background-color: black;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #003300;
+    }
+
+    .copied {
+      font-size: 0.9em;
+      margin-top: 10px;
+      color: #00ff00;
+      display: none;
+    }
+
+    // jakals credsss
+    .branding {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      color: #00ff00;
+      text-shadow: 0 0 8px #00ff00;
+      font-size: 0.9em;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .branding img {
+      width: 64px;
+      height: auto;
+      margin-top: 5px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <! matrux crap
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- Audio (autoplay with mute fallback) -->
+  <audio id="ambientAudio" autoplay loop>
+    <source src="https://cdn.pixabay.com/audio/2023/03/06/audio_96a738b9a3.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <div class="container">
+    <h1>Secure Generator</h1>
+    <div id="output">Click Generate</div>
+    <div>
+      <button onclick="generateSecureString()">Generate</button>
+      <button onclick="copyToClipboard()">Copy</button>
+      <button onclick="saveToFile()">Save</button>
+    </div>
+    <div id="copiedMsg" class="copied">✔ Copied to clipboard!</div>
+  </div>
+
+  // more branding
+  <div class="branding">
+    <div>Jakalvr Studios</div>
+    <div>discord.gg/aviationvr</div>
+    <img src="https://th.bing.com/th/id/OIP.astBg_v8lipS0rZUAMYlfAAAAA?cb=iwp2&rs=1&pid=ImgDetMain" alt="Logo">
+  </div>
+
+  <script>
+    // Matrix Background
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = 'アァイイウエカキクケコサシスセソナニヌネノABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.shadowColor = '#00ff00';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#00ff00';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const char = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 33);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // typewriter type shi
+    function typeWriterEffect(text, element, speed = 50) {
+      let i = 0;
+      element.textContent = '';
+      const interval = setInterval(() => {
+        element.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, speed);
+    }
+
+    // Password Generator
+    function generateSecureString() {
+      const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*(!#^&>)';
+      const array = new Uint32Array(16);
+      window.crypto.getRandomValues(array);
+      let result = '';
+      for (let i = 0; i < array.length; i++) {
+        result += charset[array[i] % charset.length];
+      }
+      const output = document.getElementById('output');
+      document.getElementById('copiedMsg').style.display = 'none';
+      typeWriterEffect(result, output);
+    }
+
+    function copyToClipboard() {
+      const text = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const msg = document.getElementById('copiedMsg');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2000);
+      });
+    }
+
+    function saveToFile() {
+      const text = document.getElementById('output').textContent;
+      if (!text || text === "Click Generate") return;
+
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'secure-password.txt';
+      link.click();
+    }
+  </script>
+</body>
+</html>
